@@ -1,7 +1,6 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,11 +8,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/src/provider.dart';
 import 'package:todo/logic/bloc/theme_cubit/theme_cubit.dart';
-import 'package:todo/logic/type_adaptors/image_file_adaptor.dart';
-import 'package:todo/todo_body.dart';
+import 'package:todo/screens/todo_body.dart';
 import 'package:sizer/sizer.dart';
 import 'package:todo/ui/theme/app_theme.dart';
 import 'package:todo/widgets/text_form_widget.dart';
@@ -21,7 +18,7 @@ import 'package:todo/widgets/text_form_widget.dart';
 
 class HomePage extends StatefulWidget {
   static String id = "HomePage";
-   HomePage({Key? key}) : super(key: key);
+   const HomePage({Key? key}) : super(key: key);
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -43,25 +40,22 @@ class _HomePageState extends State<HomePage> {
      file=await imagePath.readAsBytesSync();
      }  on PlatformException catch(e) { print(e);}}
 
-     onClickDarkMode(){
-       context.read<ThemeCubit>().toggleDarkMode();
-     }
+     onClickDarkMode(){ context.read<ThemeCubit>().toggleDarkMode(); }
 
      onAddClick(){
-       titleController.clear();
-       descriptionController.clear();
-       return showDialog<void>(
-         context: context,
-         barrierDismissible: false, // user must tap button!
-         builder: (BuildContext context) {
-           return AlertDialog(
-             title: buildTitle(),
-             content: buildContent(),
-             actions: <Widget>[
-               buildTextBtn()
-             ],
-           );
-           },);}
+    titleController.clear();
+    descriptionController.clear();
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: buildTitle(),
+          content: buildContent(),
+          actions: <Widget>[
+            buildTextBtn()
+             ],);
+        },);}
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +123,9 @@ class _HomePageState extends State<HomePage> {
       child:  Text('ADD',style: TextStyle(color: Theme.of(context).textColor),),
       onPressed: () {
         box.add([titleController.text,descriptionController.text,file]);
+        setState(() {
+          file=null;
+        });
         Navigator.of(context).pop();
       },
     );
@@ -150,18 +147,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  buildDarkModeIcon() {
+ BlocBuilder buildDarkModeIcon() {
     return  BlocBuilder<ThemeCubit, AppThemeState>(
       builder: (context, appThemeState) {
         return Image.asset(
-
           (appThemeState is LightThemeState)
               ? "assets/light.png"
               : "assets/dark.png",
           width: 55,
-
-
-
         );
       },
     );
